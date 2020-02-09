@@ -1,21 +1,14 @@
-"""
-Implementation of the Deep Temporal Clustering model
-Main file
-
-@author Florent Forest (FlorentF9)
-"""
-
-# Utilities
 import os
 import csv
 import argparse
+import warnings
 from time import time
 
 # Keras
-from keras.models import Model
-from keras.layers import Dense, Reshape, UpSampling2D, Conv2DTranspose, GlobalAveragePooling1D, Softmax
-from keras.losses import kullback_leibler_divergence
-import keras.backend as K
+from tensorflow.keras.models import Model
+from tensorflow.keras.layers import Dense, Reshape, UpSampling2D, Conv2DTranspose, GlobalAveragePooling1D, Softmax
+from tensorflow.keras.losses import kullback_leibler_divergence
+import tensorflow.keras.backend as K
 
 # scikit-learn
 from sklearn.cluster import AgglomerativeClustering, KMeans
@@ -29,6 +22,7 @@ from TAE import temporal_autoencoder
 from metrics import *
 import tsdistances
 
+warnings.filterwarnings('ignore')
 
 class DTC:
     """
@@ -42,7 +36,7 @@ class DTC:
         kernel_size: size of kernel in convolutional layer
         strides: strides in convolutional layer
         pool_size: pooling size in max pooling layer, must divide the time series length
-        n_units: numbers of units in the two BiLSTM layers
+        n_units: numbers of units in the two BiLSTM layers, output dimensionality
         alpha: coefficient in Student's kernel
         dist_metric: distance metric between latent sequences
         cluster_init: cluster initialization method
@@ -453,13 +447,13 @@ if __name__ == "__main__":
     # Parsing arguments and setting hyper-parameters
     parser = argparse.ArgumentParser(description='train', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('--dataset', default='CBF', help='UCR/UEA univariate or multivariate dataset')
-    #parser.add_argument('--validation', default=False, type=bool, help='use train/validation split')
+    # parser.add_argument('--validation', default=False, type=bool, help='use train/validation split')
     parser.add_argument('--ae_weights', default=None, help='pre-trained autoencoder weights')
     parser.add_argument('--n_clusters', default=None, type=int, help='number of clusters')
     parser.add_argument('--n_filters', default=50, type=int, help='number of filters in convolutional layer')
     parser.add_argument('--kernel_size', default=10, type=int, help='size of kernel in convolutional layer')
     parser.add_argument('--strides', default=1, type=int, help='strides in convolutional layer')
-    parser.add_argument('--pool_size', default=10, type=int, help='pooling size in max pooling layer')
+    parser.add_argument('--pool_size', default=8, type=int, help='pooling size in max pooling layer')
     parser.add_argument('--n_units', nargs=2, default=[50, 1], type=int, help='numbers of units in the BiLSTM layers')
     parser.add_argument('--gamma', default=1.0, type=float, help='coefficient of clustering loss')
     parser.add_argument('--alpha', default=1.0, type=float, help='coefficient in Student\'s kernel')
@@ -486,6 +480,9 @@ if __name__ == "__main__":
 
     # Load data
     (X_train, y_train), (X_val, y_val) = load_data(args.dataset), (None, None)  # no train/validation split for now
+
+    print(X_train.shape)
+    print(y_train.shape)
 
     # Find number of clusters
     if args.n_clusters is None:

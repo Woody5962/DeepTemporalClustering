@@ -5,9 +5,9 @@ Temporal Autoencoder (TAE)
 @author Florent Forest (FlorentF9)
 """
 
-from keras.models import Model
-from keras.layers import Input, Conv1D, LeakyReLU, MaxPool1D, CuDNNLSTM, Bidirectional, TimeDistributed, Dense, Reshape
-from keras.layers import UpSampling2D, Conv2DTranspose
+from tensorflow.keras.models import Model
+from tensorflow.keras.layers import Input, Conv1D, LeakyReLU, MaxPool1D, LSTM, Bidirectional, TimeDistributed, Dense, Reshape
+from tensorflow.keras.layers import UpSampling2D, Conv2DTranspose
 
 
 def temporal_autoencoder(input_dim, timesteps, n_filters=50, kernel_size=10, strides=1, pool_size=10, n_units=[50, 1]):
@@ -37,9 +37,9 @@ def temporal_autoencoder(input_dim, timesteps, n_filters=50, kernel_size=10, str
     encoded = Conv1D(n_filters, kernel_size, strides=strides, padding='same', activation='linear')(x)
     encoded = LeakyReLU()(encoded)
     encoded = MaxPool1D(pool_size)(encoded)
-    encoded = Bidirectional(CuDNNLSTM(n_units[0], return_sequences=True), merge_mode='sum')(encoded)
+    encoded = Bidirectional(LSTM(n_units[0], return_sequences=True), merge_mode='sum')(encoded)
     encoded = LeakyReLU()(encoded)
-    encoded = Bidirectional(CuDNNLSTM(n_units[1], return_sequences=True), merge_mode='sum')(encoded)
+    encoded = Bidirectional(LSTM(n_units[1], return_sequences=True), merge_mode='sum')(encoded)
     encoded = LeakyReLU(name='latent')(encoded)
 
     # Decoder
@@ -96,9 +96,9 @@ def temporal_autoencoder_v2(input_dim, timesteps, n_filters=50, kernel_size=10, 
     encoded = Conv1D(n_filters, kernel_size, strides=strides, padding='same', activation='linear')(x)
     encoded = LeakyReLU()(encoded)
     encoded = MaxPool1D(pool_size)(encoded)
-    encoded = Bidirectional(CuDNNLSTM(n_units[0], return_sequences=True), merge_mode='concat')(encoded)
+    encoded = Bidirectional(LSTM(n_units[0], return_sequences=True), merge_mode='concat')(encoded)
     encoded = LeakyReLU()(encoded)
-    encoded = Bidirectional(CuDNNLSTM(n_units[1], return_sequences=True), merge_mode='concat')(encoded)
+    encoded = Bidirectional(LSTM(n_units[1], return_sequences=True), merge_mode='concat')(encoded)
     encoded = LeakyReLU(name='latent')(encoded)
 
     # Decoder

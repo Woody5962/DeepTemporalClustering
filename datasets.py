@@ -2,7 +2,6 @@
 Implementation of the Deep Temporal Clustering model
 Dataset loading functions
 
-@author Florent Forest (FlorentF9)
 """
 
 import numpy as np
